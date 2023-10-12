@@ -16,10 +16,14 @@ router.get("/", async function (req, res, next) {
 //**GET /companies/[code] :** Return obj of company: `{company: {code, name, description}}`
 //If the company given cannot be found, this should return a 404 status response.
 router.get("/:code", async (req, res, next) => {
+  const { code } = req.params;
   try {
     const result = await db.query("SELECT * FROM companies WHERE code=$1 ", [
-      req.params.code,
+      code,
     ]);
+    if (result.rowCount === 0) {
+      throw new ExpressError(`Company with code of '${code}' not found`, 404);
+    }
     return res.json({ company: result.rows[0] });
   } catch (err) {
     return next(err);
@@ -27,7 +31,6 @@ router.get("/:code", async (req, res, next) => {
 });
 
 // **POST /companies :** Adds a company. Needs to be given JSON like: `{code, name, description}` Returns obj of new company:  `{company: {code, name, description}}`
-
 router.post("/", async (req, res, next) => {
   try {
     const { code, name, description } = req.body;
@@ -35,7 +38,7 @@ router.post("/", async (req, res, next) => {
       "INSERT INTO companies (code, name, description) VALUES ($1,$2,$3) RETURNING *",
       [code, name, description]
     );
-    return res.status(201).json(result.rows[0]);
+    return res.status(201).json({ company: result.rows[0] });
   } catch (err) {
     return next(err);
   }
@@ -43,7 +46,6 @@ router.post("/", async (req, res, next) => {
 
 // **PUT /companies/[code] :** Edit existing company. Should return 404 if company cannot be found.
 // Needs to be given JSON like: `{name, description}` Returns update company object: `{company: {code, name, description}}`
-
 router.patch("/:code", async (req, res, next) => {
   try {
     const { code } = req.params;
@@ -55,7 +57,7 @@ router.patch("/:code", async (req, res, next) => {
     if (result.rowCount === 0) {
       throw new ExpressError(`Company with code of '${code}' not found`, 404);
     }
-    return res.json(result.rows[0]);
+    return res.json({ company: result.rows[0] });
   } catch (err) {
     return next(err);
   }
@@ -63,7 +65,6 @@ router.patch("/:code", async (req, res, next) => {
 
 // **DELETE /companies/[code] :** Deletes company. Should return 404 if company cannot be found.
 // Returns `{status: "deleted"}`
-
 router.delete("/:code", async (req, res, next) => {
   try {
     const { code } = req.params;
