@@ -1,6 +1,6 @@
 ## *Node-pg Relationships*
 
-**In this exercise, you’ll build a REST-ful backend API server for a simple company/invoice tracker.**
+**Build a REST-ful backend API server for a simple company/invoice tracker.**
 
 ## **Step 0: Setup**
 - Install  ***express*** and ***pg*** via NPM
@@ -65,5 +65,3 @@ Returns: `{invoice: {id, comp_code, amt, paid, add_date, paid_date}}`
 Needs to be passed in a JSON body of `{amt}` Returns: `{invoice: {id, comp_code, amt, paid, add_date, paid_date}}`
 
 **DELETE /invoices/[id] :** Deletes an invoice.If invoice cannot be found, returns a 404. Returns: `{status: "deleted"}` Also, one route from the previous part should be updated:
-
-**GET /companies/[code] :** Return obj of company: `{company: {code, name, description, invoices: [id, ...]}}` If the company given cannot be found, this should return a 404 status response.
