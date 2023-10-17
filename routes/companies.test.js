@@ -8,8 +8,8 @@ let testCompany;
 
 beforeEach(async () => {
   const result = await db.query(
-    `INSERT INTO companies (code, name, description) VALUES ($1,$2,$3) RETURNING code, name, description`,
-    ["goog", "Alphabet Inc", "Google"]
+    `INSERT INTO companies (name, description) VALUES ($1,$2) RETURNING code, name, description`,
+    ["Google", "Actually know as Alphabet Inc"]
   );
   testCompany = result.rows[0];
 });
@@ -35,7 +35,7 @@ describe("GET /companies", () => {
 // **GET /companies/[code]
 describe("GET /companies/[code]", () => {
   test("Returns obj of a company", async () => {
-    const result = await request(app).get(`/companies/goog`);
+    const result = await request(app).get(`/companies/google`);
     expect(result.statusCode).toEqual(200);
     expect(result.body).toEqual({ company: testCompany });
   });
@@ -54,15 +54,14 @@ describe("GET /companies/[code]", () => {
 describe("POST /companies", () => {
   test("Adds a company, returns obj of new company added}`", async () => {
     const result = await request(app).post(`/companies`).send({
-      code: "apple",
-      name: "Apple Computer",
+      name: "Apple",
       description: "Description of apple test",
     });
     expect(result.statusCode).toEqual(201);
     expect(result.body).toEqual({
       company: {
         code: "apple",
-        name: "Apple Computer",
+        name: "Apple",
         description: "Description of apple test",
       },
     });
@@ -73,12 +72,12 @@ describe("POST /companies", () => {
 describe("PATCH /companies/:code", () => {
   test("Edit existing company, returns updated company object", async () => {
     const result = await request(app)
-      .patch(`/companies/goog`)
+      .patch(`/companies/google`)
       .send({ name: "Test Company", description: "No longer google company" });
     expect(result.statusCode).toBe(200);
     expect(result.body).toEqual({
       company: {
-        code: "goog",
+        code: "google",
         name: "Test Company",
         description: "No longer google company",
       },
@@ -97,7 +96,7 @@ describe("PATCH /companies/:code", () => {
 // **DELETE /companies/[code]
 describe("DELETE /companies/:code", () => {
   test("Delete an existing company", async () => {
-    const result = await request(app).delete(`/companies/goog`);
+    const result = await request(app).delete(`/companies/google`);
     expect(result.statusCode).toBe(200);
     expect(result.body).toEqual({ status: "deleted" });
   });

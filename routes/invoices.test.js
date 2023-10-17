@@ -8,16 +8,18 @@ let testInvoice;
 
 beforeEach(async () => {
   const testCompany = await db.query(
-    `INSERT INTO companies (code, name, description) VALUES ($1,$2,$3) RETURNING code, name, description`,
-    ["apple", "Apple Computer", "Maker of OsX"]
+    `INSERT INTO companies (name, description) VALUES ($1,$2) RETURNING code, name, description`,
+    ["Apple", "Maker of OsX"]
   );
+
   const result = await db.query(
-    `INSERT INTO invoices (comp_code, amt, paid, add_date, paid_date) 
-       VALUES ($1, $2, $3, $4, $5) RETURNING id,comp_code, amt, paid, add_date, paid_date`,
-    ["apple", 100, false, "2018-01-01", null]
+    `INSERT INTO invoices (comp_code, amt, paid, paid_date) 
+       VALUES ($1, $2, $3, $4) RETURNING id,comp_code, amt, paid, add_date, paid_date`,
+    ["apple", 100, false, null]
   );
   testInvoice = result.rows[0];
-  console.log(testInvoice);
+  console.log(testInvoice.add_date);
+  invoiceAddDate = testInvoice.add_date.toISOString();
 });
 
 afterEach(async () => {
@@ -42,7 +44,7 @@ describe("GET /invoices", () => {
           comp_code: "apple",
           amt: 100,
           paid: false,
-          add_date: "2018-01-01T05:00:00.000Z",
+          add_date: invoiceAddDate,
           paid_date: null,
         },
       ],
@@ -61,7 +63,7 @@ describe("GET /invoices/[id]", () => {
         comp_code: "apple",
         amt: 100,
         paid: false,
-        add_date: "2018-01-01T05:00:00.000Z",
+        add_date: invoiceAddDate,
         paid_date: null,
       },
     });
@@ -90,7 +92,7 @@ describe("POST /invoices", () => {
         comp_code: "apple",
         amt: 100,
         paid: false,
-        add_date: "2023-10-12T04:00:00.000Z",
+        add_date: invoiceAddDate,
         paid_date: null,
       },
     });
@@ -110,7 +112,7 @@ describe("PATCH /invoices/[id]", () => {
         comp_code: "apple",
         amt: 1000,
         paid: false,
-        add_date: "2018-01-01T05:00:00.000Z",
+        add_date: invoiceAddDate,
         paid_date: null,
       },
     });
