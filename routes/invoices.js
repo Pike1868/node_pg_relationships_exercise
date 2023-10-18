@@ -59,7 +59,7 @@ router.patch("/:id", async (req, res, next) => {
     if (invoicePaidStatus.rows.length === 0) {
       throw new ExpressError(`Invoice with id of '${id}' not found`, 404);
     }
-    const invoicePaidDate = invoicePaidStatus.rows[0].paid_date;
+    let invoicePaidDate = invoicePaidStatus.rows[0].paid_date;
     if (!invoicePaidDate && paid) {
       invoicePaidDate = new Date();
     } else if (!paid) {
@@ -83,7 +83,7 @@ router.delete("/:id", async (req, res, next) => {
   try {
     const { id } = req.params;
     const result = await db.query("DELETE FROM invoices WHERE id=$1", [id]);
-    if (result.rows.length === 0) {
+    if (result.rowCount !== 1) {
       throw new ExpressError(`Invoice with id of '${id}' not found`, 404);
     }
     return res.status(200).json({ status: "deleted" });

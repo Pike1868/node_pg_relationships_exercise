@@ -8,8 +8,8 @@ let testCompany;
 
 beforeEach(async () => {
   const result = await db.query(
-    `INSERT INTO companies (name, description) VALUES ($1,$2) RETURNING code, name, description`,
-    ["Google", "Actually know as Alphabet Inc"]
+    `INSERT INTO companies (code, name, description) VALUES ($1,$2,$3) RETURNING code, name, description`,
+    ["google", "Google", "Actually know as Alphabet Inc"]
   );
   testCompany = result.rows[0];
 });
@@ -96,8 +96,9 @@ describe("PATCH /companies/:code", () => {
 // **DELETE /companies/[code]
 describe("DELETE /companies/:code", () => {
   test("Delete an existing company", async () => {
+    console.log(testCompany);
     const result = await request(app).delete(`/companies/google`);
-    expect(result.statusCode).toBe(200);
+    expect(result.statusCode).toEqual(200);
     expect(result.body).toEqual({ status: "deleted" });
   });
   test("Should return 404 if company cannot be found.", async () => {

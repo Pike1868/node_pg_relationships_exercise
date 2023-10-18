@@ -8,7 +8,7 @@ const slugify = require("slugify");
 router.get("/", async (req, res, next) => {
   try {
     const result = await db.query(
-      "SELECT i.code, i.name, ci.comp_code FROM industries AS i, companies_industries As ci WHERE i.code = ci.ind_code"
+      "SELECT i.code, i.name, array_agg(ci.comp_code) AS companies FROM industries AS i, companies_industries As ci WHERE i.code = ci.ind_code GROUP BY i.code, i.name"
     );
     return res.json({ industries: result.rows });
   } catch (err) {

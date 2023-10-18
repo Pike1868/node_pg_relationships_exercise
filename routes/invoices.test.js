@@ -8,8 +8,8 @@ let testInvoice;
 
 beforeEach(async () => {
   const testCompany = await db.query(
-    `INSERT INTO companies (name, description) VALUES ($1,$2) RETURNING code, name, description`,
-    ["Apple", "Maker of OsX"]
+    `INSERT INTO companies (code, name, description) VALUES ($1,$2, $3) RETURNING code, name, description`,
+    ["apple", "Apple", "Maker of OsX"]
   );
 
   const result = await db.query(
@@ -18,7 +18,6 @@ beforeEach(async () => {
     ["apple", 100, false, null]
   );
   testInvoice = result.rows[0];
-  console.log(testInvoice.add_date);
   invoiceAddDate = testInvoice.add_date.toISOString();
 });
 
@@ -102,9 +101,11 @@ describe("POST /invoices", () => {
 // **PATCH /invoices/[id]
 describe("PATCH /invoices/[id]", () => {
   test("Updates an existing invoice, returns updated invoice object", async () => {
+    console.log("======================");
+    console.log(testInvoice.id);
     const result = await request(app)
       .patch(`/invoices/${testInvoice.id}`)
-      .send({ amt: 1000 });
+      .send({ amt: 1000, paid: false });
     expect(result.statusCode).toBe(200);
     expect(result.body).toEqual({
       invoice: {
